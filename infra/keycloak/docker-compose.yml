@@ -1,0 +1,54 @@
+version: '3.8'
+
+# ============================================================
+# Keycloak — proveedor de identidad (OIDC / OAuth2) del stack Devsu
+# Protege los endpoints de los microservicios mediante JWT.
+# Usa la BD "keycloak" de devsu_postgres como backend.
+# Importa automáticamente el realm "devsu" desde ./realm.
+# ============================================================
+# Requisitos previos:
+#   1. Red externa creada:   docker network create devsu_network
+#   2. Postgres arriba:      (carpeta ../postgres) docker compose up -d
+# Uso:  docker compose up -d
+# Admin console: http://localhost:8081  (admin/admin)
+# ============================================================
+
+services:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: devsu_keycloak
+    restart: unless-stopped
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      # Backend Postgres (mismo contenedor devsu_postgres, alias "postgres")
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: ${POSTGRES_USER:-devsu}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-devsu}
+      # HTTP / hostname (modo desarrollo)
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+    ports:
+      - "${KEYCLOAK_PORT:-8081}:8080"
+    volumes:
+      - ./realm:/opt/keycloak/data/import:ro
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000; echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3; cat <&3 | grep -q '200 OK'"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    networks:
+      devsu_network:
+        aliases:
+          - keycloak
+
+networks:
+  devsu_network:
+    name: devsu_network
+    external: true

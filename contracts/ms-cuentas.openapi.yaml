@@ -1,0 +1,413 @@
+openapi: 3.0.3
+info:
+  title: MS Cuentas API
+  description: >-
+    Microservicio de Cuentas y Movimientos — Prueba técnica Devsu.
+    Gestiona Cuentas y Movimientos (F1), la lógica de saldos (F2), la validación
+    de "Saldo no disponible" (F3) y el reporte de Estado de Cuenta (F4).
+    Mantiene una réplica local de Clientes sincronizada de forma asíncrona
+    (RabbitMQ) desde ms-clientes.
+  version: 1.0.0
+  contact:
+    name: John Fredy Quimbaya
+servers:
+  - url: http://localhost:8086
+    description: Local (puerto host del microservicio ms-cuentas)
+
+tags:
+  - name: Cuentas
+    description: Operaciones CRU sobre cuentas (F1)
+  - name: Movimientos
+    description: Registro y consulta de movimientos (F1, F2, F3)
+  - name: Reportes
+    description: Reporte de estado de cuenta (F4)
+
+paths:
+  # ---------------------------------------------------------------- CUENTAS
+  /api/cuentas:
+    get:
+      tags: [Cuentas]
+      summary: Listar cuentas
+      operationId: listarCuentas
+      responses:
+        '200':
+          description: Lista de cuentas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CuentaResponse'
+    post:
+      tags: [Cuentas]
+      summary: Crear cuenta
+      operationId: crearCuenta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CuentaRequest'
+            example:
+              numeroCuenta: "478758"
+              tipoCuenta: AHORROS
+              saldoInicial: 2000
+              estado: true
+              clienteId: jlema
+      responses:
+        '201':
+          description: Cuenta creada
+          headers:
+            Location:
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CuentaResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: El cliente referenciado no existe (réplica local)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/cuentas/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Cuentas]
+      summary: Obtener cuenta por id
+      operationId: obtenerCuenta
+      responses:
+        '200':
+          description: Cuenta encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CuentaResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Cuentas]
+      summary: Actualizar cuenta (campos editables)
+      operationId: actualizarCuenta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CuentaUpdateRequest'
+      responses:
+        '200':
+          description: Cuenta actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CuentaResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ------------------------------------------------------------ MOVIMIENTOS
+  /api/movimientos:
+    get:
+      tags: [Movimientos]
+      summary: Listar movimientos
+      operationId: listarMovimientos
+      responses:
+        '200':
+          description: Lista de movimientos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovimientoResponse'
+    post:
+      tags: [Movimientos]
+      summary: Registrar movimiento (F2/F3)
+      description: >-
+        Registra un movimiento sobre una cuenta. El valor puede ser positivo
+        (depósito) o negativo (retiro). Se actualiza el saldo disponible y se
+        guarda el histórico. Si el retiro supera el saldo disponible se
+        devuelve 422 con el mensaje "Saldo no disponible".
+      operationId: registrarMovimiento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MovimientoRequest'
+            examples:
+              deposito:
+                summary: Depósito de 600
+                value:
+                  numeroCuenta: "225487"
+                  valor: 600
+              retiro:
+                summary: Retiro de 575
+                value:
+                  numeroCuenta: "478758"
+                  valor: -575
+      responses:
+        '201':
+          description: Movimiento registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovimientoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Saldo no disponible (F3)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: "2022-02-10T10:15:30"
+                status: 422
+                error: Unprocessable Entity
+                message: Saldo no disponible
+                path: /api/movimientos
+
+  /api/movimientos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Movimientos]
+      summary: Obtener movimiento por id
+      operationId: obtenerMovimiento
+      responses:
+        '200':
+          description: Movimiento encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovimientoResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Movimientos]
+      summary: Actualizar descripción del movimiento (el monto es inmutable)
+      operationId: actualizarMovimiento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MovimientoUpdateRequest'
+      responses:
+        '200':
+          description: Movimiento actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovimientoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ---------------------------------------------------------------- REPORTES
+  /api/reportes:
+    get:
+      tags: [Reportes]
+      summary: Estado de cuenta por rango de fechas y cliente (F4)
+      operationId: estadoDeCuenta
+      parameters:
+        - name: fechaInicio
+          in: query
+          required: true
+          description: Fecha inicial del rango (yyyy-MM-dd)
+          schema: { type: string, format: date, example: "2022-02-01" }
+        - name: fechaFin
+          in: query
+          required: true
+          description: Fecha final del rango (yyyy-MM-dd)
+          schema: { type: string, format: date, example: "2022-02-28" }
+        - name: cliente
+          in: query
+          required: true
+          description: clienteId del cliente a reportar
+          schema: { type: string, example: mmontalvo }
+      responses:
+        '200':
+          description: Reporte en formato JSON
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReporteEstadoCuenta'
+              example:
+                - Fecha: "10/2/2022 10:15:30"
+                  Cliente: Marianela Montalvo
+                  "Numero Cuenta": "225487"
+                  Tipo: Corriente
+                  "Saldo Inicial": 100
+                  Estado: true
+                  Movimiento: 600
+                  "Saldo Disponible": 700
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    IdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+
+  responses:
+    BadRequest:
+      description: Datos de entrada inválidos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflicto — número de cuenta ya existe
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    TipoCuenta:
+      type: string
+      enum: [AHORROS, CORRIENTE]
+
+    TipoMovimiento:
+      type: string
+      description: Derivado del signo del valor
+      enum: [DEPOSITO, RETIRO]
+
+    CuentaRequest:
+      type: object
+      required: [numeroCuenta, tipoCuenta, saldoInicial, estado, clienteId]
+      properties:
+        numeroCuenta:
+          type: string
+          description: Número de cuenta. Único.
+          example: "478758"
+        tipoCuenta:
+          $ref: '#/components/schemas/TipoCuenta'
+        saldoInicial:
+          type: number
+          format: double
+          example: 2000
+        estado:
+          type: boolean
+          example: true
+        clienteId:
+          type: string
+          description: clienteId dueño de la cuenta (validado contra réplica local)
+          example: jlema
+
+    CuentaUpdateRequest:
+      type: object
+      description: Campos editables de la cuenta
+      properties:
+        tipoCuenta: { $ref: '#/components/schemas/TipoCuenta' }
+        estado: { type: boolean }
+
+    CuentaResponse:
+      type: object
+      properties:
+        id: { type: integer, format: int64, example: 1 }
+        numeroCuenta: { type: string, example: "478758" }
+        tipoCuenta: { $ref: '#/components/schemas/TipoCuenta' }
+        saldoInicial: { type: number, format: double, example: 2000 }
+        saldoDisponible:
+          type: number
+          format: double
+          description: Saldo actual tras los movimientos
+          example: 1425
+        estado: { type: boolean, example: true }
+        clienteId: { type: string, example: jlema }
+
+    MovimientoRequest:
+      type: object
+      required: [numeroCuenta, valor]
+      properties:
+        numeroCuenta:
+          type: string
+          example: "478758"
+        valor:
+          type: number
+          format: double
+          description: Positivo = depósito, negativo = retiro. Distinto de cero.
+          example: -575
+        descripcion:
+          type: string
+          description: Nota libre del movimiento (opcional, metadata).
+          maxLength: 255
+          example: "Retiro cajero"
+
+    MovimientoUpdateRequest:
+      type: object
+      description: >-
+        Único campo editable de un movimiento. El ledger es inmutable: el monto
+        (valor) y el saldo no se modifican. Corregir un monto se hace con un
+        movimiento de reversa.
+      required: [descripcion]
+      properties:
+        descripcion: { type: string, maxLength: 255, example: "Pago de nómina" }
+
+    MovimientoResponse:
+      type: object
+      properties:
+        id: { type: integer, format: int64, example: 1 }
+        fecha: { type: string, format: date-time, example: "2022-02-10T10:15:30" }
+        tipoMovimiento: { $ref: '#/components/schemas/TipoMovimiento' }
+        valor: { type: number, format: double, example: -575 }
+        saldo:
+          type: number
+          format: double
+          description: Saldo disponible resultante tras el movimiento
+          example: 1425
+        cuentaId: { type: integer, format: int64, example: 1 }
+        descripcion: { type: string, nullable: true, example: "Pago de nómina" }
+
+    ReporteEstadoCuenta:
+      type: object
+      description: >-
+        Fila del reporte de estado de cuenta. Las claves JSON respetan
+        exactamente el ejemplo del enunciado (capitalizadas, con espacios).
+      properties:
+        Fecha: { type: string, example: "10/2/2022 10:15:30" }
+        Cliente: { type: string, example: Marianela Montalvo }
+        "Numero Cuenta": { type: string, example: "225487" }
+        Tipo: { type: string, example: Corriente }
+        "Saldo Inicial": { type: number, example: 100 }
+        Estado: { type: boolean, example: true }
+        Movimiento: { type: number, example: 600 }
+        "Saldo Disponible": { type: number, example: 700 }
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp: { type: string, format: date-time }
+        status: { type: integer, example: 422 }
+        error: { type: string, example: Unprocessable Entity }
+        message: { type: string, example: Saldo no disponible }
+        path: { type: string, example: /api/movimientos }

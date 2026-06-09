@@ -1,0 +1,144 @@
+{
+  "info": {
+    "name": "Dev-su-MSclients",
+    "description": "Microservicio de Clientes (CRUD, F1). Ejecuta 'Obtener Token' primero; el JWT se guarda en la variable {{token}} y se usa en todas las peticiones (auth heredada). Completa la variable 'clientSecret' antes de empezar (Keycloak > Clients > ms-clientes > Credentials).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8085" },
+    { "key": "keycloakUrl", "value": "http://localhost:8081" },
+    { "key": "realm", "value": "internos-dev" },
+    { "key": "clientId", "value": "ms-clientes" },
+    { "key": "clientSecret", "value": "<COMPLETAR: Keycloak > Clients > ms-clientes > Credentials>" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "0. Obtener Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('token', json.access_token);",
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "pm.test('access_token recibido', () => pm.expect(json.access_token).to.be.a('string'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            { "key": "grant_type", "value": "client_credentials" },
+            { "key": "client_id", "value": "{{clientId}}" },
+            { "key": "client_secret", "value": "{{clientSecret}}" }
+          ]
+        },
+        "url": {
+          "raw": "{{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/token",
+          "host": ["{{keycloakUrl}}"],
+          "path": ["realms", "{{realm}}", "protocol", "openid-connect", "token"]
+        },
+        "description": "Obtiene un JWT (client_credentials) y lo guarda en la variable {{token}}."
+      }
+    },
+    {
+      "name": "Crear Cliente - Jose Lema",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Jose Lema\",\n  \"genero\": \"MASCULINO\",\n  \"edad\": 35,\n  \"identificacion\": \"0102030405\",\n  \"direccion\": \"Otavalo sn y principal\",\n  \"telefono\": \"098254785\",\n  \"clienteId\": \"CLI-001\",\n  \"contrasena\": \"1234\",\n  \"estado\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{baseUrl}}/api/clientes", "host": ["{{baseUrl}}"], "path": ["api", "clientes"] }
+      }
+    },
+    {
+      "name": "Crear Cliente - Marianela Montalvo",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Marianela Montalvo\",\n  \"genero\": \"FEMENINO\",\n  \"edad\": 30,\n  \"identificacion\": \"0203040506\",\n  \"direccion\": \"Amazonas y NNUU\",\n  \"telefono\": \"097548965\",\n  \"clienteId\": \"CLI-002\",\n  \"contrasena\": \"5678\",\n  \"estado\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{baseUrl}}/api/clientes", "host": ["{{baseUrl}}"], "path": ["api", "clientes"] }
+      }
+    },
+    {
+      "name": "Crear Cliente - Juan Osorio",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Juan Osorio\",\n  \"genero\": \"MASCULINO\",\n  \"edad\": 40,\n  \"identificacion\": \"0304050607\",\n  \"direccion\": \"13 junio y Equinoccial\",\n  \"telefono\": \"098874587\",\n  \"clienteId\": \"CLI-003\",\n  \"contrasena\": \"1245\",\n  \"estado\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{baseUrl}}/api/clientes", "host": ["{{baseUrl}}"], "path": ["api", "clientes"] }
+      }
+    },
+    {
+      "name": "Crear Cliente - John Quimbaya",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"John Fredy Quimbaya Orozco\",\n  \"genero\": \"MASCULINO\",\n  \"edad\": 44,\n  \"identificacion\": \"94041671\",\n  \"direccion\": \"Carrera 66B #2C-44\",\n  \"telefono\": \"3004756201\",\n  \"clienteId\": \"jquimbay\",\n  \"contrasena\": \"qwerty123\",\n  \"estado\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{baseUrl}}/api/clientes", "host": ["{{baseUrl}}"], "path": ["api", "clientes"] }
+      }
+    },
+    {
+      "name": "Listar Clientes",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/clientes", "host": ["{{baseUrl}}"], "path": ["api", "clientes"] }
+      }
+    },
+    {
+      "name": "Obtener Cliente por id",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/api/clientes/1", "host": ["{{baseUrl}}"], "path": ["api", "clientes", "1"] }
+      }
+    },
+    {
+      "name": "Actualizar Cliente (PUT total)",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"John Fredy Quimbaya Orozco\",\n  \"genero\": \"MASCULINO\",\n  \"edad\": 45,\n  \"identificacion\": \"94041671\",\n  \"direccion\": \"Carrera 66B #2C-44\",\n  \"telefono\": \"3000000000\",\n  \"clienteId\": \"jquimbay\",\n  \"contrasena\": \"qwerty123\",\n  \"estado\": true\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{baseUrl}}/api/clientes/1", "host": ["{{baseUrl}}"], "path": ["api", "clientes", "1"] }
+      }
+    },
+    {
+      "name": "Eliminar Cliente",
+      "request": {
+        "method": "DELETE",
+        "url": { "raw": "{{baseUrl}}/api/clientes/4", "host": ["{{baseUrl}}"], "path": ["api", "clientes", "4"] },
+        "description": "Ajusta el id al cliente que quieras eliminar (son autogenerados)."
+      }
+    }
+  ]
+}

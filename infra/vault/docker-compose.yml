@@ -1,0 +1,46 @@
+version: '3.8'
+
+# ============================================================
+# HashiCorp Vault — gestión centralizada de secretos del stack Devsu
+# Guarda credenciales de BD, RabbitMQ y client-secret de Keycloak,
+# consumidas por los microservicios vía Spring Cloud Vault.
+#
+# MODO DEV: arranque automático, des-sellado (unsealed) y en memoria.
+# Ideal para evaluar/demostrar. NO usar dev mode en producción
+# (sin persistencia; token root fijo).
+# ============================================================
+# Uso:  docker compose up -d
+# UI:   http://localhost:8200  (Token: devsu-root-token)
+# Seed: ./seed-secrets.sh  (carga los secretos iniciales)
+# ============================================================
+
+services:
+
+  vault:
+    image: hashicorp/vault:latest
+    container_name: devsu_vault
+    restart: unless-stopped
+    cap_add:
+      - IPC_LOCK
+    ports:
+      - "${VAULT_PORT:-8200}:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_ROOT_TOKEN:-devsu-root-token}
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+      VAULT_ADDR: http://127.0.0.1:8200
+    command: server -dev
+    healthcheck:
+      test: ["CMD", "vault", "status"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      devsu_network:
+        aliases:
+          - vault
+
+networks:
+  devsu_network:
+    name: devsu_network
+    external: true

@@ -1,0 +1,47 @@
+version: '3.8'
+
+# ============================================================
+# PostgreSQL — base de datos relacional del stack Devsu
+# Aloja las BDs de los microservicios (database-per-service):
+#   - devsu_clientes  (ms-clientes)
+#   - devsu_cuentas   (ms-cuentas)
+#   - keycloak        (backend de Keycloak)
+# El script ./init se ejecuta SOLO en el primer arranque (volumen vacío).
+# ============================================================
+# Uso:  docker compose up -d
+# ============================================================
+
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: devsu_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-devsu}
+      POSTGRES_USER: ${POSTGRES_USER:-devsu}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devsu}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - devsu_postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-devsu} -d ${POSTGRES_DB:-devsu}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      devsu_network:
+        aliases:
+          - postgres
+
+volumes:
+  devsu_postgres_data:
+    name: devsu_postgres_data
+
+networks:
+  devsu_network:
+    name: devsu_network
+    external: true

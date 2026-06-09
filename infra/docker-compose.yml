@@ -1,0 +1,22 @@
+version: '3.8'
+
+# ============================================================
+# Orquestador de INFRAESTRUCTURA — stack Devsu
+# Agrega los compose de cada aplicación mediante "include"
+# (Docker Compose v2.20+). Levanta toda la base de soporte
+# (Postgres, RabbitMQ, Keycloak, Vault) con un solo comando.
+#
+# Los microservicios (ms-clientes, ms-cuentas) se levantan aparte
+# desde la raíz del repo, conectándose a la red devsu_network.
+# ============================================================
+# Requisito previo (una sola vez):
+#   docker network create devsu_network
+# Uso:
+#   docker compose up -d
+# ============================================================
+
+include:
+  - path: ./postgres/docker-compose.yml
+  - path: ./rabbitmq/docker-compose.yml
+  - path: ./keycloak/docker-compose.yml
+  - path: ./vault/docker-compose.yml

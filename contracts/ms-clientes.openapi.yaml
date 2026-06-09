@@ -1,0 +1,225 @@
+openapi: 3.0.3
+info:
+  title: MS Clientes API
+  description: >-
+    Microservicio de Clientes y Personas — Prueba técnica Devsu.
+    Gestiona el CRUD de Clientes (entidad de dominio que hereda de Persona) y
+    publica eventos de dominio hacia RabbitMQ para sincronizar el microservicio
+    de Cuentas (comunicación asíncrona).
+  version: 1.0.0
+  contact:
+    name: John Fredy Quimbaya
+servers:
+  - url: http://localhost:8085
+    description: Local (puerto host del microservicio ms-clientes)
+
+tags:
+  - name: Clientes
+    description: Operaciones CRUD sobre clientes (F1)
+
+paths:
+  /api/clientes:
+    get:
+      tags: [Clientes]
+      summary: Listar clientes
+      operationId: listarClientes
+      responses:
+        '200':
+          description: Lista de clientes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClienteResponse'
+    post:
+      tags: [Clientes]
+      summary: Crear cliente
+      operationId: crearCliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+            example:
+              nombre: Jose Lema
+              genero: MASCULINO
+              edad: 35
+              identificacion: "0102030405"
+              direccion: Otavalo sn y principal
+              telefono: "098254785"
+              clienteId: jlema
+              contrasena: "1234"
+              estado: true
+      responses:
+        '201':
+          description: Cliente creado
+          headers:
+            Location:
+              description: URI del recurso creado
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/clientes/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Clientes]
+      summary: Obtener cliente por id
+      operationId: obtenerCliente
+      responses:
+        '200':
+          description: Cliente encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Clientes]
+      summary: Actualizar cliente
+      operationId: actualizarCliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+      responses:
+        '200':
+          description: Cliente actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    delete:
+      tags: [Clientes]
+      summary: Eliminar cliente
+      operationId: eliminarCliente
+      responses:
+        '204':
+          description: Cliente eliminado (sin contenido)
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    IdPath:
+      name: id
+      in: path
+      required: true
+      description: Identificador interno (PK) del cliente
+      schema:
+        type: integer
+        format: int64
+
+  responses:
+    BadRequest:
+      description: Datos de entrada inválidos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflicto — identificación o clienteId ya existen
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    Genero:
+      type: string
+      enum: [MASCULINO, FEMENINO, OTRO]
+
+    ClienteRequest:
+      type: object
+      required: [nombre, identificacion, clienteId, contrasena, estado]
+      properties:
+        nombre:
+          type: string
+          minLength: 2
+          maxLength: 120
+          example: Jose Lema
+        genero:
+          $ref: '#/components/schemas/Genero'
+        edad:
+          type: integer
+          minimum: 0
+          maximum: 120
+          example: 35
+        identificacion:
+          type: string
+          description: Documento de identidad. Único.
+          maxLength: 20
+          example: "0102030405"
+        direccion:
+          type: string
+          maxLength: 200
+          example: Otavalo sn y principal
+        telefono:
+          type: string
+          maxLength: 20
+          example: "098254785"
+        clienteId:
+          type: string
+          description: Identificador de negocio / usuario de login. Único.
+          maxLength: 50
+          example: jlema
+        contrasena:
+          type: string
+          description: Clave de acceso. Solo escritura; nunca se devuelve.
+          minLength: 4
+          maxLength: 100
+          example: "1234"
+        estado:
+          type: boolean
+          example: true
+
+    ClienteResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        nombre: { type: string, example: Jose Lema }
+        genero: { $ref: '#/components/schemas/Genero' }
+        edad: { type: integer, example: 35 }
+        identificacion: { type: string, example: "0102030405" }
+        direccion: { type: string, example: Otavalo sn y principal }
+        telefono: { type: string, example: "098254785" }
+        clienteId: { type: string, example: jlema }
+        estado: { type: boolean, example: true }
+
+    ErrorResponse:
+      type: object
+      description: Estructura estándar de error (RFC-7807 simplificado)
+      properties:
+        timestamp: { type: string, format: date-time }
+        status: { type: integer, example: 404 }
+        error: { type: string, example: Not Found }
+        message: { type: string, example: "Cliente no encontrado con id: 99" }
+        path: { type: string, example: /api/clientes/99 }

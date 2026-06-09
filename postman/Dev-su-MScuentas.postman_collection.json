@@ -1,0 +1,275 @@
+{
+  "info": {
+    "name": "Dev-su-MScuentas",
+    "description": "Microservicio de Cuentas y Movimientos (F1-F4). Ejecuta 'Obtener Token' primero; el JWT se guarda en {{token}} y se usa en todas las peticiones (auth heredada). Completa la variable 'clientSecret' antes de empezar. Requiere que los clientes existan (corre antes la colección Dev-su-MSclients).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8086" },
+    { "key": "keycloakUrl", "value": "http://localhost:8081" },
+    { "key": "realm", "value": "internos-dev" },
+    { "key": "clientId", "value": "ms-clientes" },
+    { "key": "clientSecret", "value": "<COMPLETAR: Keycloak > Clients > ms-clientes > Credentials>" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "0. Obtener Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('token', json.access_token);",
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "pm.test('access_token recibido', () => pm.expect(json.access_token).to.be.a('string'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            { "key": "grant_type", "value": "client_credentials" },
+            { "key": "client_id", "value": "{{clientId}}" },
+            { "key": "client_secret", "value": "{{clientSecret}}" }
+          ]
+        },
+        "url": {
+          "raw": "{{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/token",
+          "host": ["{{keycloakUrl}}"],
+          "path": ["realms", "{{realm}}", "protocol", "openid-connect", "token"]
+        },
+        "description": "Obtiene un JWT (client_credentials) y lo guarda en la variable {{token}}."
+      }
+    },
+    {
+      "name": "Cuentas (F1)",
+      "item": [
+        {
+          "name": "Crear Cuenta - 478758 (Ahorros, CLI-001)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroCuenta\": \"478758\",\n  \"tipoCuenta\": \"AHORROS\",\n  \"saldoInicial\": 2000,\n  \"estado\": true,\n  \"clienteId\": \"CLI-001\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/cuentas", "host": ["{{baseUrl}}"], "path": ["api", "cuentas"] }
+          }
+        },
+        {
+          "name": "Crear Cuenta - 225487 (Corriente, CLI-002)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroCuenta\": \"225487\",\n  \"tipoCuenta\": \"CORRIENTE\",\n  \"saldoInicial\": 100,\n  \"estado\": true,\n  \"clienteId\": \"CLI-002\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/cuentas", "host": ["{{baseUrl}}"], "path": ["api", "cuentas"] }
+          }
+        },
+        {
+          "name": "Crear Cuenta - 495878 (Ahorros, CLI-003)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroCuenta\": \"495878\",\n  \"tipoCuenta\": \"AHORROS\",\n  \"saldoInicial\": 0,\n  \"estado\": true,\n  \"clienteId\": \"CLI-003\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/cuentas", "host": ["{{baseUrl}}"], "path": ["api", "cuentas"] }
+          }
+        },
+        {
+          "name": "Crear Cuenta - 496825 (Ahorros, CLI-002)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroCuenta\": \"496825\",\n  \"tipoCuenta\": \"AHORROS\",\n  \"saldoInicial\": 540,\n  \"estado\": true,\n  \"clienteId\": \"CLI-002\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/cuentas", "host": ["{{baseUrl}}"], "path": ["api", "cuentas"] }
+          }
+        },
+        {
+          "name": "Crear Cuenta - 585545 (Corriente, CLI-001)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroCuenta\": \"585545\",\n  \"tipoCuenta\": \"CORRIENTE\",\n  \"saldoInicial\": 1000,\n  \"estado\": true,\n  \"clienteId\": \"CLI-001\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/cuentas", "host": ["{{baseUrl}}"], "path": ["api", "cuentas"] }
+          }
+        },
+        {
+          "name": "Listar Cuentas",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/cuentas", "host": ["{{baseUrl}}"], "path": ["api", "cuentas"] }
+          }
+        },
+        {
+          "name": "Obtener Cuenta por id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/cuentas/1", "host": ["{{baseUrl}}"], "path": ["api", "cuentas", "1"] }
+          }
+        },
+        {
+          "name": "Actualizar Cuenta (PUT - solo tipo/estado)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoCuenta\": \"AHORROS\",\n  \"estado\": false\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/cuentas/1", "host": ["{{baseUrl}}"], "path": ["api", "cuentas", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Movimientos (F2/F3)",
+      "item": [
+        {
+          "name": "Retiro 575 - cuenta 478758",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroCuenta\": \"478758\",\n  \"valor\": -575,\n  \"descripcion\": \"Retiro cajero\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/movimientos", "host": ["{{baseUrl}}"], "path": ["api", "movimientos"] }
+          }
+        },
+        {
+          "name": "Deposito 600 - cuenta 225487",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroCuenta\": \"225487\",\n  \"valor\": 600,\n  \"descripcion\": \"Deposito\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/movimientos", "host": ["{{baseUrl}}"], "path": ["api", "movimientos"] }
+          }
+        },
+        {
+          "name": "Deposito 150 - cuenta 495878",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroCuenta\": \"495878\",\n  \"valor\": 150,\n  \"descripcion\": \"Deposito\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/movimientos", "host": ["{{baseUrl}}"], "path": ["api", "movimientos"] }
+          }
+        },
+        {
+          "name": "Retiro 540 - cuenta 496825",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroCuenta\": \"496825\",\n  \"valor\": -540,\n  \"descripcion\": \"Retiro\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/movimientos", "host": ["{{baseUrl}}"], "path": ["api", "movimientos"] }
+          }
+        },
+        {
+          "name": "F3 - Retiro sin saldo (espera 422)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroCuenta\": \"495878\",\n  \"valor\": -100000,\n  \"descripcion\": \"Retiro que excede el saldo\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/movimientos", "host": ["{{baseUrl}}"], "path": ["api", "movimientos"] },
+            "description": "Debe responder 422 con el mensaje 'Saldo no disponible' (F3)."
+          }
+        },
+        {
+          "name": "Listar Movimientos",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/movimientos", "host": ["{{baseUrl}}"], "path": ["api", "movimientos"] }
+          }
+        },
+        {
+          "name": "Obtener Movimiento por id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/movimientos/1", "host": ["{{baseUrl}}"], "path": ["api", "movimientos", "1"] }
+          }
+        },
+        {
+          "name": "Actualizar descripcion del movimiento",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Pago de nomina\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/movimientos/1", "host": ["{{baseUrl}}"], "path": ["api", "movimientos", "1"] },
+            "description": "Solo edita la descripcion (metadata). El monto y el saldo son inmutables (ledger)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reporte (F4)",
+      "item": [
+        {
+          "name": "Estado de cuenta por rango y cliente",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/reportes?fechaInicio=2026-06-01&fechaFin=2026-06-30&cliente=CLI-002",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reportes"],
+              "query": [
+                { "key": "fechaInicio", "value": "2026-06-01" },
+                { "key": "fechaFin", "value": "2026-06-30" },
+                { "key": "cliente", "value": "CLI-002" }
+              ]
+            },
+            "description": "Usa un rango que incluya la fecha de los movimientos (se crean con la fecha/hora actual)."
+          }
+        }
+      ]
+    }
+  ]
+}

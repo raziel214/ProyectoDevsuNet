@@ -1,0 +1,46 @@
+version: '3.8'
+
+# ============================================================
+# RabbitMQ — mensajería asíncrona entre microservicios Devsu
+# ms-clientes publica eventos ClienteEvent y ms-cuentas los consume
+# para mantener su réplica local de clientes (ver contracts/).
+# Imagen con plugin de management (UI web en :15672).
+# ============================================================
+# Uso:  docker compose up -d
+# UI:   http://localhost:15672  (user/pass por defecto: devsu/devsu)
+# ============================================================
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: devsu_rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-devsu}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-devsu}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-devsu}
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"       # protocolo AMQP
+      - "${RABBITMQ_MGMT_PORT:-15672}:15672" # consola de administración
+    volumes:
+      - devsu_rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      devsu_network:
+        aliases:
+          - rabbitmq
+
+volumes:
+  devsu_rabbitmq_data:
+    name: devsu_rabbitmq_data
+
+networks:
+  devsu_network:
+    name: devsu_network
+    external: true

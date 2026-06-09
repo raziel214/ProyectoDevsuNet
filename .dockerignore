@@ -1,0 +1,54 @@
+# ============================================================
+# .dockerignore — microservicios .NET
+# Reduce el contexto de build enviado al daemon Docker.
+# Mantener SOLO lo necesario para compilar dentro de la imagen:
+#   *.sln, *.csproj y src/
+# ============================================================
+
+# ---------- Artefactos de compilación ----------
+**/bin/
+**/obj/
+**/out/
+**/publish/
+
+# ---------- Control de versiones ----------
+.git/
+.gitignore
+.gitattributes
+
+# ---------- IDEs / editores ----------
+.idea/
+.vs/
+.vscode/
+*.user
+
+# ---------- Docker / infra (no se necesitan dentro del build) ----------
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# ---------- Documentación / contratos / scripts ----------
+*.md
+README*
+../contracts/
+../infra/
+../postman/
+
+# ---------- Secretos y entornos ----------
+.env
+.env.*
+*.pem
+*.key
+*.p12
+
+# ---------- Sistema operativo / temporales ----------
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+*~
+
+# ---------- Reportes de test ----------
+**/TestResults/
+*.trx

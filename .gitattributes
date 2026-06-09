@@ -1,0 +1,45 @@
+# ============================================================
+# .gitattributes — Proyecto Devsu .NET (monorepo)
+# Normaliza fin de línea (CRLF/LF) para que el código generado en
+# Windows funcione dentro de los contenedores Linux. Evita el bug
+# clásico "bad interpreter: /bin/sh^M" en scripts.
+# ============================================================
+
+# Por defecto: git decide texto vs binario y normaliza a LF en el repo
+* text=auto
+
+# ---------- Código y configuración (forzar LF) ----------
+*.cs       text eol=lf
+*.csproj   text eol=lf
+*.sln      text eol=crlf
+*.props    text eol=lf
+*.targets  text eol=lf
+*.xml      text eol=lf
+*.yml      text eol=lf
+*.yaml     text eol=lf
+*.json     text eol=lf
+*.sql      text eol=lf
+*.md       text eol=lf
+*.txt      text eol=lf
+*.sh       text eol=lf
+Dockerfile text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.dockerignore  text eol=lf
+
+# ---------- Scripts Windows ----------
+*.cmd  text eol=crlf
+*.bat  text eol=crlf
+*.ps1  text eol=crlf
+
+# ---------- Binarios (sin conversión ni diff) ----------
+*.dll  binary
+*.exe  binary
+*.pdb  binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.p12  binary
