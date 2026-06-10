@@ -8,8 +8,8 @@ namespace Devsu.Clientes.Infrastructure.Vault;
 public sealed record VaultSecrets(
     string DbUsername,
     string DbPassword,
-    string RabbitUsername,
-    string RabbitPassword)
+    string? RabbitUsername,
+    string? RabbitPassword)
 {
     public const string KeyDbUsername = "spring.datasource.username";
     public const string KeyDbPassword = "spring.datasource.password";

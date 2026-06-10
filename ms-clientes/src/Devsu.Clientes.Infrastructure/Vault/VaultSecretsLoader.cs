@@ -45,10 +45,13 @@ public static class VaultSecretsLoader
 
             var data = kv.Data.Data;
             var secrets = new VaultSecrets(
+                // Credenciales de BD: obligatorias.
                 DbUsername: Require(data, VaultSecrets.KeyDbUsername),
                 DbPassword: Require(data, VaultSecrets.KeyDbPassword),
-                RabbitUsername: Require(data, VaultSecrets.KeyRabbitUsername),
-                RabbitPassword: Require(data, VaultSecrets.KeyRabbitPassword));
+                // Credenciales de RabbitMQ: opcionales (si no estan en el secreto,
+                // se usan las de configuracion). El secreto compartido solo trae datasource.
+                RabbitUsername: Optional(data, VaultSecrets.KeyRabbitUsername),
+                RabbitPassword: Optional(data, VaultSecrets.KeyRabbitPassword));
 
             logger.LogInformation("[Vault] Secretos de {Path} cargados correctamente.", options.SecretPath);
             return secrets;
@@ -64,4 +67,7 @@ public static class VaultSecretsLoader
         => data.TryGetValue(key, out var value) && value is not null
             ? value.ToString()!
             : throw new InvalidOperationException($"Falta la clave '{key}' en el secreto de Vault.");
+
+    private static string? Optional(IDictionary<string, object> data, string key)
+        => data.TryGetValue(key, out var value) ? value?.ToString() : null;
 }

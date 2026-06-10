@@ -60,8 +60,10 @@ builder.Services.AddClientesInfrastructure(connectionString, rabbit =>
 {
     builder.Configuration.GetSection(RabbitMqOptions.SectionName).Bind(rabbit);
     rabbit.Host = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? rabbit.Host;
-    rabbit.Username = secrets.RabbitUsername;
-    rabbit.Password = secrets.RabbitPassword;
+    // Las credenciales de rabbit solo se sobrescriben si el secreto las trae;
+    // si no, quedan las de configuracion.
+    if (!string.IsNullOrEmpty(secrets.RabbitUsername)) rabbit.Username = secrets.RabbitUsername;
+    if (!string.IsNullOrEmpty(secrets.RabbitPassword)) rabbit.Password = secrets.RabbitPassword;
 });
 
 // ============================================================
