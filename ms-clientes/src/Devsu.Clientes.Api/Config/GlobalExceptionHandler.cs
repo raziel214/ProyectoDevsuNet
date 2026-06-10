@@ -20,6 +20,7 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         {
             ClienteNoEncontradoException => StatusCodes.Status404NotFound,
             ClienteDuplicadoException => StatusCodes.Status409Conflict,
+            ContrasenaActualInvalidaException => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };
 

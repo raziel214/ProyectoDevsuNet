@@ -12,4 +12,7 @@ public interface IPasswordHasherPort
 {
     /// <summary>Devuelve el hash seguro (BCrypt) de una contraseña en texto plano.</summary>
     string Hash(string rawPassword);
+
+    /// <summary>Verifica que una contraseña en texto plano corresponda a un hash.</summary>
+    bool Verify(string rawPassword, string hash);
 }

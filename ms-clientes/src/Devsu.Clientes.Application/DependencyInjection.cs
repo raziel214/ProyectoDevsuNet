@@ -17,6 +17,8 @@ public static class DependencyInjection
         services.AddScoped<ICrearClienteUseCase>(sp => sp.GetRequiredService<ClienteService>());
         services.AddScoped<IConsultarClienteUseCase>(sp => sp.GetRequiredService<ClienteService>());
         services.AddScoped<IActualizarClienteUseCase>(sp => sp.GetRequiredService<ClienteService>());
+        services.AddScoped<ICambiarEstadoClienteUseCase>(sp => sp.GetRequiredService<ClienteService>());
+        services.AddScoped<ICambiarContrasenaClienteUseCase>(sp => sp.GetRequiredService<ClienteService>());
         services.AddScoped<IEliminarClienteUseCase>(sp => sp.GetRequiredService<ClienteService>());
 
         return services;

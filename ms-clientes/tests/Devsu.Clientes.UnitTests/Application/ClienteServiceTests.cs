@@ -4,6 +4,7 @@ using Devsu.Clientes.Application.Service;
 using Devsu.Clientes.Domain.Exceptions;
 using Devsu.Clientes.Domain.Model;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 
@@ -19,11 +20,12 @@ public class ClienteServiceTests
     private readonly IClienteRepositoryPort _repo = Substitute.For<IClienteRepositoryPort>();
     private readonly IPasswordHasherPort _hasher = Substitute.For<IPasswordHasherPort>();
     private readonly IClienteEventPublisherPort _publisher = Substitute.For<IClienteEventPublisherPort>();
+    private readonly ILogger<ClienteService> _logger = Substitute.For<ILogger<ClienteService>>();
     private readonly ClienteService _service;
 
     public ClienteServiceTests()
     {
-        _service = new ClienteService(_repo, _hasher, _publisher);
+        _service = new ClienteService(_repo, _hasher, _publisher, _logger);
         // Por defecto el repositorio devuelve el cliente que recibe al guardar.
         _repo.GuardarAsync(Arg.Any<Cliente>(), Arg.Any<CancellationToken>())
             .Returns(ci => ci.Arg<Cliente>());
@@ -35,14 +37,12 @@ public class ClienteServiceTests
     public async Task Crear_hashea_la_contrasena_guarda_y_publica_evento()
     {
         _hasher.Hash("1234").Returns("HASH");
-        Cliente? guardado = null;
-        _repo.GuardarAsync(Arg.Do<Cliente>(c => guardado = c), Arg.Any<CancellationToken>())
-            .Returns(ci => ci.Arg<Cliente>());
+        var guardado = CapturarGuardado();
 
         var result = await _service.CrearAsync(Comando());
 
-        guardado!.Contrasena.Should().Be("HASH");          // se persiste el hash, no el texto plano
-        guardado.Estado.Should().BeTrue();
+        guardado().Contrasena.Should().Be("HASH");         // se persiste el hash, no el texto plano
+        guardado().Estado.Should().BeTrue();
         await _publisher.Received(1).PublicarCreadoAsync(Arg.Any<Cliente>(), Arg.Any<CancellationToken>());
         result.ClienteId.Should().Be("jlema");
     }
@@ -50,13 +50,11 @@ public class ClienteServiceTests
     [Fact]
     public async Task Crear_asigna_estado_true_cuando_el_comando_no_lo_trae()
     {
-        Cliente? guardado = null;
-        _repo.GuardarAsync(Arg.Do<Cliente>(c => guardado = c), Arg.Any<CancellationToken>())
-            .Returns(ci => ci.Arg<Cliente>());
+        var guardado = CapturarGuardado();
 
         await _service.CrearAsync(Comando() with { Estado = null });
 
-        guardado!.Estado.Should().BeTrue();
+        guardado().Estado.Should().BeTrue();
     }
 
     [Fact]
@@ -103,53 +101,25 @@ public class ClienteServiceTests
         await act.Should().ThrowAsync<ClienteNoEncontradoException>();
     }
 
-    // ---------- Actualizar ----------
+    // ---------- Actualizar perfil ----------
 
     [Fact]
-    public async Task Actualizar_conserva_la_identidad_y_publica_evento()
+    public async Task Actualizar_cambia_perfil_y_conserva_identidad_estado_y_contrasena()
     {
         _repo.BuscarPorIdAsync(1, Arg.Any<CancellationToken>()).Returns(ClienteExistente());
-        Cliente? guardado = null;
-        _repo.GuardarAsync(Arg.Do<Cliente>(c => guardado = c), Arg.Any<CancellationToken>())
-            .Returns(ci => ci.Arg<Cliente>());
+        var guardado = CapturarGuardado();
 
-        await _service.ActualizarAsync(1, ComandoActualizar());
+        await _service.ActualizarAsync(1, PerfilComando());
 
-        // La identidad (Id, ClienteId, Identificacion) NO cambia.
-        guardado!.Id.Should().Be(1);
-        guardado.ClienteId.Should().Be("jlema");
-        guardado.Identificacion.Should().Be("0102030405");
-        // Los datos modificables sí.
-        guardado.Nombre.Should().Be("Jose Actualizado");
+        // La identidad, estado y credencial NO cambian con el perfil.
+        guardado().Id.Should().Be(1);
+        guardado().ClienteId.Should().Be("jlema");
+        guardado().Identificacion.Should().Be("0102030405");
+        guardado().Estado.Should().BeTrue();
+        guardado().Contrasena.Should().Be("HASH_EXISTENTE");
+        // Los datos de perfil sí.
+        guardado().Nombre.Should().Be("Jose Actualizado");
         await _publisher.Received(1).PublicarActualizadoAsync(Arg.Any<Cliente>(), Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task Actualizar_conserva_la_contrasena_si_el_comando_no_la_trae()
-    {
-        _repo.BuscarPorIdAsync(1, Arg.Any<CancellationToken>()).Returns(ClienteExistente());
-        Cliente? guardado = null;
-        _repo.GuardarAsync(Arg.Do<Cliente>(c => guardado = c), Arg.Any<CancellationToken>())
-            .Returns(ci => ci.Arg<Cliente>());
-
-        await _service.ActualizarAsync(1, ComandoActualizar() with { Contrasena = null });
-
-        guardado!.Contrasena.Should().Be("HASH_EXISTENTE");        // conserva la actual
-        _hasher.DidNotReceive().Hash(Arg.Any<string>());          // no re-hashea
-    }
-
-    [Fact]
-    public async Task Actualizar_rehashea_si_llega_una_contrasena_nueva()
-    {
-        _repo.BuscarPorIdAsync(1, Arg.Any<CancellationToken>()).Returns(ClienteExistente());
-        _hasher.Hash("nueva").Returns("HASH_NUEVO");
-        Cliente? guardado = null;
-        _repo.GuardarAsync(Arg.Do<Cliente>(c => guardado = c), Arg.Any<CancellationToken>())
-            .Returns(ci => ci.Arg<Cliente>());
-
-        await _service.ActualizarAsync(1, ComandoActualizar() with { Contrasena = "nueva" });
-
-        guardado!.Contrasena.Should().Be("HASH_NUEVO");
     }
 
     [Fact]
@@ -157,7 +127,71 @@ public class ClienteServiceTests
     {
         _repo.BuscarPorIdAsync(99, Arg.Any<CancellationToken>()).Returns((Cliente?)null);
 
-        var act = () => _service.ActualizarAsync(99, ComandoActualizar());
+        var act = () => _service.ActualizarAsync(99, PerfilComando());
+
+        await act.Should().ThrowAsync<ClienteNoEncontradoException>();
+    }
+
+    // ---------- Cambiar estado ----------
+
+    [Fact]
+    public async Task CambiarEstado_actualiza_el_estado_y_publica_evento()
+    {
+        _repo.BuscarPorIdAsync(1, Arg.Any<CancellationToken>()).Returns(ClienteExistente());
+        var guardado = CapturarGuardado();
+
+        await _service.CambiarEstadoAsync(1, estado: false);
+
+        guardado().Estado.Should().BeFalse();
+        guardado().ClienteId.Should().Be("jlema");          // identidad intacta
+        await _publisher.Received(1).PublicarActualizadoAsync(Arg.Any<Cliente>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task CambiarEstado_lanza_no_encontrado_cuando_no_existe()
+    {
+        _repo.BuscarPorIdAsync(99, Arg.Any<CancellationToken>()).Returns((Cliente?)null);
+
+        var act = () => _service.CambiarEstadoAsync(99, estado: false);
+
+        await act.Should().ThrowAsync<ClienteNoEncontradoException>();
+    }
+
+    // ---------- Cambiar contraseña ----------
+
+    [Fact]
+    public async Task CambiarContrasena_verifica_la_actual_rehashea_la_nueva_y_no_publica()
+    {
+        _repo.BuscarPorIdAsync(1, Arg.Any<CancellationToken>()).Returns(ClienteExistente());
+        _hasher.Verify("actual", "HASH_EXISTENTE").Returns(true);
+        _hasher.Hash("nueva").Returns("HASH_NUEVO");
+        var guardado = CapturarGuardado();
+
+        await _service.CambiarContrasenaAsync(1, new CambiarContrasenaCommand("actual", "nueva"));
+
+        guardado().Contrasena.Should().Be("HASH_NUEVO");
+        // La contraseña no afecta la réplica de cuentas: no se publica evento.
+        await _publisher.DidNotReceive().PublicarActualizadoAsync(Arg.Any<Cliente>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task CambiarContrasena_lanza_si_la_actual_es_incorrecta()
+    {
+        _repo.BuscarPorIdAsync(1, Arg.Any<CancellationToken>()).Returns(ClienteExistente());
+        _hasher.Verify("mala", "HASH_EXISTENTE").Returns(false);
+
+        var act = () => _service.CambiarContrasenaAsync(1, new CambiarContrasenaCommand("mala", "nueva"));
+
+        await act.Should().ThrowAsync<ContrasenaActualInvalidaException>();
+        await _repo.DidNotReceive().GuardarAsync(Arg.Any<Cliente>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task CambiarContrasena_lanza_no_encontrado_cuando_no_existe()
+    {
+        _repo.BuscarPorIdAsync(99, Arg.Any<CancellationToken>()).Returns((Cliente?)null);
+
+        var act = () => _service.CambiarContrasenaAsync(99, new CambiarContrasenaCommand("a", "b"));
 
         await act.Should().ThrowAsync<ClienteNoEncontradoException>();
     }
@@ -188,14 +222,23 @@ public class ClienteServiceTests
 
     // ---------- Helpers ----------
 
+    /// <summary>Captura el Cliente pasado a GuardarAsync para inspeccionarlo.</summary>
+    private Func<Cliente> CapturarGuardado()
+    {
+        Cliente? guardado = null;
+        _repo.GuardarAsync(Arg.Do<Cliente>(c => guardado = c), Arg.Any<CancellationToken>())
+            .Returns(ci => ci.Arg<Cliente>());
+        return () => guardado!;
+    }
+
     private static CrearClienteCommand Comando() => new(
         Nombre: "Jose Lema", Genero: Genero.MASCULINO, Edad: 35,
         Identificacion: "0102030405", Direccion: "Otavalo", Telefono: "098254785",
         ClienteId: "jlema", Contrasena: "1234", Estado: true);
 
-    private static ActualizarClienteCommand ComandoActualizar() => new(
+    private static ActualizarPerfilCommand PerfilComando() => new(
         Nombre: "Jose Actualizado", Genero: Genero.MASCULINO, Edad: 36,
-        Direccion: "Nueva dir", Telefono: "099999999", Contrasena: "1234", Estado: true);
+        Direccion: "Nueva dir", Telefono: "099999999");
 
     private static Cliente ClienteExistente() => new()
     {

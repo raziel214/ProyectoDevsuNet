@@ -14,10 +14,12 @@ public static class ClienteWebMapper
         r.Nombre, r.Genero, r.Edad, r.Identificacion,
         r.Direccion, r.Telefono, r.ClienteId, r.Contrasena, r.Estado);
 
-    /// <summary>En actualización no se cambian identificación ni clienteId (identidad).</summary>
-    public static ActualizarClienteCommand ToActualizarCommand(ClienteRequest r) => new(
-        r.Nombre, r.Genero, r.Edad,
-        r.Direccion, r.Telefono, r.Contrasena, r.Estado ?? true);
+    /// <summary>Perfil: solo datos personales (sin identidad, estado ni contraseña).</summary>
+    public static ActualizarPerfilCommand ToActualizarPerfilCommand(ActualizarPerfilRequest r) => new(
+        r.Nombre, r.Genero, r.Edad, r.Direccion, r.Telefono);
+
+    public static CambiarContrasenaCommand ToCambiarContrasenaCommand(CambiarContrasenaRequest r) => new(
+        r.ContrasenaActual, r.ContrasenaNueva);
 
     public static ClienteResponse ToResponse(Cliente c) => new(
         c.Id, c.Nombre, c.Genero, c.Edad,

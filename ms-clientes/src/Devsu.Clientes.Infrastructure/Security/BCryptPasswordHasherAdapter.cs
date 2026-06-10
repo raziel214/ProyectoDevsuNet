@@ -14,4 +14,7 @@ public sealed class BCryptPasswordHasherAdapter : IPasswordHasherPort
 {
     public string Hash(string rawPassword)
         => BCrypt.Net.BCrypt.HashPassword(rawPassword);
+
+    public bool Verify(string rawPassword, string hash)
+        => BCrypt.Net.BCrypt.Verify(rawPassword, hash);
 }

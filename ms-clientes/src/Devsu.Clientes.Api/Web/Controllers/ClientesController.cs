@@ -18,6 +18,8 @@ public sealed class ClientesController(
     ICrearClienteUseCase crearCliente,
     IConsultarClienteUseCase consultarCliente,
     IActualizarClienteUseCase actualizarCliente,
+    ICambiarEstadoClienteUseCase cambiarEstadoCliente,
+    ICambiarContrasenaClienteUseCase cambiarContrasenaCliente,
     IEliminarClienteUseCase eliminarCliente) : ControllerBase
 {
     /// <summary>Crear cliente.</summary>
@@ -51,15 +53,37 @@ public sealed class ClientesController(
         return Ok(ClienteWebMapper.ToResponse(cliente));
     }
 
-    /// <summary>Actualizar cliente.</summary>
+    /// <summary>Actualizar el perfil (datos personales) de un cliente.</summary>
     [HttpPut("{id:long}")]
     [ProducesResponseType(typeof(ClienteResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ClienteResponse>> Actualizar(long id, [FromBody] ClienteRequest request, CancellationToken ct)
+    public async Task<ActionResult<ClienteResponse>> Actualizar(long id, [FromBody] ActualizarPerfilRequest request, CancellationToken ct)
     {
-        var cliente = await actualizarCliente.ActualizarAsync(id, ClienteWebMapper.ToActualizarCommand(request), ct);
+        var cliente = await actualizarCliente.ActualizarAsync(id, ClienteWebMapper.ToActualizarPerfilCommand(request), ct);
         return Ok(ClienteWebMapper.ToResponse(cliente));
+    }
+
+    /// <summary>Habilitar/inhabilitar un cliente (operación sensible, auditada).</summary>
+    [HttpPatch("{id:long}/estado")]
+    [ProducesResponseType(typeof(ClienteResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ClienteResponse>> CambiarEstado(long id, [FromBody] CambiarEstadoRequest request, CancellationToken ct)
+    {
+        var cliente = await cambiarEstadoCliente.CambiarEstadoAsync(id, request.Estado!.Value, ct);
+        return Ok(ClienteWebMapper.ToResponse(cliente));
+    }
+
+    /// <summary>Cambiar la contraseña (credencial) de un cliente. Verifica la actual.</summary>
+    [HttpPost("{id:long}/contrasena")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CambiarContrasena(long id, [FromBody] CambiarContrasenaRequest request, CancellationToken ct)
+    {
+        await cambiarContrasenaCliente.CambiarContrasenaAsync(id, ClienteWebMapper.ToCambiarContrasenaCommand(request), ct);
+        return NoContent();
     }
 
     /// <summary>Eliminar cliente.</summary>

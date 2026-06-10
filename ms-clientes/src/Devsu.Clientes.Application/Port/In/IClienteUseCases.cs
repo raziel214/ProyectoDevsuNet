@@ -15,10 +15,28 @@ public interface IConsultarClienteUseCase
     Task<IReadOnlyList<Cliente>> ListarAsync(CancellationToken ct = default);
 }
 
-/// <summary>Caso de uso: actualizar un cliente (F1).</summary>
+/// <summary>Caso de uso: actualizar el perfil de un cliente (datos personales).</summary>
 public interface IActualizarClienteUseCase
 {
-    Task<Cliente> ActualizarAsync(long id, ActualizarClienteCommand command, CancellationToken ct = default);
+    Task<Cliente> ActualizarAsync(long id, ActualizarPerfilCommand command, CancellationToken ct = default);
+}
+
+/// <summary>
+/// Caso de uso sensible: habilitar/inhabilitar un cliente. Separado del perfil
+/// por ser una operación auditable de dominio bancario.
+/// </summary>
+public interface ICambiarEstadoClienteUseCase
+{
+    Task<Cliente> CambiarEstadoAsync(long id, bool estado, CancellationToken ct = default);
+}
+
+/// <summary>
+/// Caso de uso sensible: cambiar la contraseña (credencial) de un cliente,
+/// verificando la contraseña actual. Separado del perfil y auditable.
+/// </summary>
+public interface ICambiarContrasenaClienteUseCase
+{
+    Task CambiarContrasenaAsync(long id, CambiarContrasenaCommand command, CancellationToken ct = default);
 }
 
 /// <summary>Caso de uso: eliminar un cliente (F1).</summary>
