@@ -11,8 +11,11 @@ public sealed class CuentasDbContextFactory : IDesignTimeDbContextFactory<Cuenta
 {
     public CuentasDbContext CreateDbContext(string[] args)
     {
+        // Solo para diseño (dotnet-ef). Generar/scriptear migraciones NO se conecta
+        // a la BD, por eso alcanza un placeholder sin credenciales reales. Para
+        // operaciones que sí conectan (database update), definir DESIGN_CONNECTION_STRING.
         var connectionString = Environment.GetEnvironmentVariable("DESIGN_CONNECTION_STRING")
-            ?? "Host=localhost;Port=5432;Database=devsu_cuentas_net;Username=devsu;Password=devsu";
+            ?? "Host=localhost;Database=design;Username=design;Password=design";
 
         var options = new DbContextOptionsBuilder<CuentasDbContext>()
             .UseNpgsql(connectionString)

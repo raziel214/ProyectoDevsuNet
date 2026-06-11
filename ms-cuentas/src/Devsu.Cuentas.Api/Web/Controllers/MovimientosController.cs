@@ -37,7 +37,12 @@ public sealed class MovimientosController(
     {
         var movimientos = await consultarMovimiento.ListarAsync(numeroCuenta, ct);
 
-        // Mapa cuentaId -> numeroCuenta para resolver el response sin N+1.
+        // Caso filtrado: todos los movimientos son de esa cuenta -> no hace falta
+        // cargar todas las cuentas, el numeroCuenta es el del filtro.
+        if (!string.IsNullOrWhiteSpace(numeroCuenta))
+            return Ok(movimientos.Select(m => MovimientoWebMapper.ToResponse(m, numeroCuenta)));
+
+        // Sin filtro: un mapa cuentaId -> numeroCuenta para resolver sin N+1.
         var cuentas = await consultarCuenta.ListarAsync(ct: ct);
         var mapa = cuentas.Where(c => c.Id is not null).ToDictionary(c => c.Id!.Value, c => c.NumeroCuenta);
 
