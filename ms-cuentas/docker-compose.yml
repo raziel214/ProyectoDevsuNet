@@ -1,0 +1,45 @@
+# ============================================================
+# docker-compose — ms-cuentas .NET
+# Conecta a la infra compartida con los alias internos (vault, postgres,
+# rabbitmq, keycloak). El consumidor usa su propia cola (...net.queue).
+#
+# Uso:
+#   1) crea ms-cuentas/.env a partir de .env.example (password de Vault)
+#   2) docker compose up -d --build
+# ============================================================
+
+services:
+  ms-cuentas-net:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: devsu/ms-cuentas-net:latest
+    container_name: ms-cuentas-net
+    restart: unless-stopped
+    ports:
+      - "8091:8080"   # host 8091 -> contenedor 8080 (8086 lo usa el Java)
+    environment:
+      # --- Vault (secretos) ---
+      VAULT_URI: http://vault:8200
+      VAULT_USERPASS_PASSWORD: ${VAULT_USERPASS_PASSWORD}
+      Vault__SecretPath: dev/devsu/ms-cuentas
+      # --- Base de datos (credenciales vienen de Vault) ---
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      Database__Name: devsu_cuentas_net
+      MigrateOnStartup: "true"
+      # --- RabbitMQ (broker compartido, puerto interno 5672) ---
+      RABBITMQ_HOST: rabbitmq
+      RabbitMq__Port: "5672"
+      RabbitMq__VirtualHost: itilsupport
+      # --- Keycloak (validacion JWT por JWKS, puerto interno 8080) ---
+      Keycloak__Authority: http://keycloak:8080/realms/internos-dev
+    networks:
+      - itil_network
+      - itilsupport_network_dev
+
+networks:
+  itil_network:
+    external: true
+  itilsupport_network_dev:
+    external: true

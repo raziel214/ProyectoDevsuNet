@@ -1,0 +1,36 @@
+using Devsu.Cuentas.Api.Web.Dto;
+
+namespace Devsu.Cuentas.Api.Config;
+
+/// <summary>
+/// Escribe los errores de seguridad (401 / 403) con el MISMO formato
+/// <see cref="ErrorResponse"/> que el resto del API. Se engancha en los eventos
+/// de JwtBearer (ocurren antes del controller).
+/// </summary>
+public static class SecurityErrorResponder
+{
+    public static Task WriteUnauthorizedAsync(HttpContext context)
+        => WriteAsync(context, StatusCodes.Status401Unauthorized,
+            "Unauthorized", "Token ausente, inválido o expirado");
+
+    public static Task WriteForbiddenAsync(HttpContext context)
+        => WriteAsync(context, StatusCodes.Status403Forbidden,
+            "Forbidden", "No tiene permisos para acceder a este recurso");
+
+    private static async Task WriteAsync(HttpContext context, int status, string error, string message)
+    {
+        if (context.Response.HasStarted) return;
+
+        context.Response.StatusCode = status;
+        context.Response.ContentType = "application/json";
+
+        var body = new ErrorResponse(
+            Timestamp: DateTimeOffset.UtcNow,
+            Status: status,
+            Error: error,
+            Message: message,
+            Path: context.Request.Path);
+
+        await context.Response.WriteAsJsonAsync(body);
+    }
+}

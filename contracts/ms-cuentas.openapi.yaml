@@ -2,17 +2,23 @@ openapi: 3.0.3
 info:
   title: MS Cuentas API
   description: >-
-    Microservicio de Cuentas y Movimientos — Prueba técnica Devsu.
+    Microservicio de Cuentas y Movimientos — Prueba técnica Devsu (versión .NET).
     Gestiona Cuentas y Movimientos (F1), la lógica de saldos (F2), la validación
-    de "Saldo no disponible" (F3) y el reporte de Estado de Cuenta (F4).
+    de "Saldo no disponible" (F3, HTTP 422) y el reporte de Estado de Cuenta (F4).
     Mantiene una réplica local de Clientes sincronizada de forma asíncrona
     (RabbitMQ) desde ms-clientes.
-  version: 1.0.0
+
+
+    Diseño de dominio bancario: las operaciones sensibles están separadas. El
+    estado de la cuenta (habilitar/inhabilitar) se cambia por un endpoint propio
+    y auditable. El ledger de movimientos es inmutable: solo la descripción
+    (metadato) es editable; valor, saldo y fecha no se modifican.
+  version: 2.0.0
   contact:
     name: John Fredy Quimbaya
 servers:
-  - url: http://localhost:8086
-    description: Local (puerto host del microservicio ms-cuentas)
+  - url: http://localhost:8091
+    description: Local (puerto host del microservicio ms-cuentas .NET)
 
 tags:
   - name: Cuentas
@@ -22,6 +28,10 @@ tags:
   - name: Reportes
     description: Reporte de estado de cuenta (F4)
 
+# Todos los endpoints (salvo health/swagger) requieren un Bearer JWT de Keycloak.
+security:
+  - bearerAuth: []
+
 paths:
   # ---------------------------------------------------------------- CUENTAS
   /api/cuentas:
@@ -29,6 +39,12 @@ paths:
       tags: [Cuentas]
       summary: Listar cuentas
       operationId: listarCuentas
+      parameters:
+        - name: clienteId
+          in: query
+          required: false
+          description: Filtro opcional por cliente
+          schema: { type: string }
       responses:
         '200':
           description: Lista de cuentas
@@ -38,6 +54,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CuentaResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
     post:
       tags: [Cuentas]
       summary: Crear cuenta
@@ -50,7 +68,7 @@ paths:
               $ref: '#/components/schemas/CuentaRequest'
             example:
               numeroCuenta: "478758"
-              tipoCuenta: AHORROS
+              tipoCuenta: AHORRO
               saldoInicial: 2000
               estado: true
               clienteId: jlema
@@ -66,6 +84,8 @@ paths:
                 $ref: '#/components/schemas/CuentaResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           description: El cliente referenciado no existe (réplica local)
           content:
@@ -89,18 +109,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CuentaResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
     put:
       tags: [Cuentas]
-      summary: Actualizar cuenta (campos editables)
+      summary: Actualizar los datos editables de una cuenta (tipo)
+      description: >-
+        Solo el tipo de cuenta es editable. El estado tiene su propio endpoint
+        (PATCH /estado); número, saldos y cliente no se editan a mano.
       operationId: actualizarCuenta
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CuentaUpdateRequest'
+              $ref: '#/components/schemas/ActualizarCuentaRequest'
       responses:
         '200':
           description: Cuenta actualizada
@@ -110,6 +135,38 @@ paths:
                 $ref: '#/components/schemas/CuentaResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/cuentas/{id}/estado:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    patch:
+      tags: [Cuentas]
+      summary: Habilitar o inhabilitar una cuenta
+      description: Operación sensible y auditada. Solo cambia el estado de la cuenta.
+      operationId: cambiarEstadoCuenta
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CambiarEstadoCuentaRequest'
+            example:
+              estado: false
+      responses:
+        '200':
+          description: Estado actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CuentaResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -119,6 +176,11 @@ paths:
       tags: [Movimientos]
       summary: Listar movimientos
       operationId: listarMovimientos
+      parameters:
+        - name: numeroCuenta
+          in: query
+          required: false
+          schema: { type: string }
       responses:
         '200':
           description: Lista de movimientos
@@ -128,14 +190,16 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MovimientoResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
     post:
       tags: [Movimientos]
       summary: Registrar movimiento (F2/F3)
       description: >-
         Registra un movimiento sobre una cuenta. El valor puede ser positivo
-        (depósito) o negativo (retiro). Se actualiza el saldo disponible y se
-        guarda el histórico. Si el retiro supera el saldo disponible se
-        devuelve 422 con el mensaje "Saldo no disponible".
+        (depósito) o negativo (retiro), distinto de cero. Se actualiza el saldo
+        disponible y se crea el asiento, de forma atómica. Si el retiro supera el
+        saldo disponible se devuelve 422 con "Saldo no disponible".
       operationId: registrarMovimiento
       requestBody:
         required: true
@@ -146,14 +210,10 @@ paths:
             examples:
               deposito:
                 summary: Depósito de 600
-                value:
-                  numeroCuenta: "225487"
-                  valor: 600
+                value: { numeroCuenta: "225487", valor: 600 }
               retiro:
                 summary: Retiro de 575
-                value:
-                  numeroCuenta: "478758"
-                  valor: -575
+                value: { numeroCuenta: "478758", valor: -575 }
       responses:
         '201':
           description: Movimiento registrado
@@ -163,6 +223,8 @@ paths:
                 $ref: '#/components/schemas/MovimientoResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -172,7 +234,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
-                timestamp: "2022-02-10T10:15:30"
+                timestamp: "2022-02-10T10:15:30Z"
                 status: 422
                 error: Unprocessable Entity
                 message: Saldo no disponible
@@ -192,18 +254,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MovimientoResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
     put:
       tags: [Movimientos]
-      summary: Actualizar descripción del movimiento (el monto es inmutable)
+      summary: Editar la descripción de un movimiento
+      description: >-
+        El ledger es inmutable: solo la descripción (metadato) es editable. El
+        valor, el saldo y la fecha no se modifican.
       operationId: actualizarMovimiento
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MovimientoUpdateRequest'
+              $ref: '#/components/schemas/ActualizarMovimientoRequest'
       responses:
         '200':
           description: Movimiento actualizado
@@ -213,6 +280,8 @@ paths:
                 $ref: '#/components/schemas/MovimientoResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -248,7 +317,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ReporteEstadoCuenta'
               example:
-                - Fecha: "10/2/2022 10:15:30"
+                - Fecha: "10/2/2022"
                   Cliente: Marianela Montalvo
                   "Numero Cuenta": "225487"
                   Tipo: Corriente
@@ -258,10 +327,19 @@ paths:
                   "Saldo Disponible": 700
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT emitido por Keycloak (realm internos-dev).
+
   parameters:
     IdPath:
       name: id
@@ -274,6 +352,12 @@ components:
   responses:
     BadRequest:
       description: Datos de entrada inválidos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Token ausente, inválido o expirado
       content:
         application/json:
           schema:
@@ -294,7 +378,7 @@ components:
   schemas:
     TipoCuenta:
       type: string
-      enum: [AHORROS, CORRIENTE]
+      enum: [AHORRO, CORRIENTE]
 
     TipoMovimiento:
       type: string
@@ -308,27 +392,39 @@ components:
         numeroCuenta:
           type: string
           description: Número de cuenta. Único.
+          maxLength: 20
           example: "478758"
         tipoCuenta:
           $ref: '#/components/schemas/TipoCuenta'
         saldoInicial:
           type: number
           format: double
+          minimum: 0
           example: 2000
         estado:
           type: boolean
           example: true
         clienteId:
           type: string
-          description: clienteId dueño de la cuenta (validado contra réplica local)
+          description: clienteId dueño de la cuenta (validado contra la réplica local)
+          maxLength: 50
           example: jlema
 
-    CuentaUpdateRequest:
+    ActualizarCuentaRequest:
       type: object
-      description: Campos editables de la cuenta
+      description: Único campo editable de la cuenta (el estado va aparte)
+      required: [tipoCuenta]
       properties:
-        tipoCuenta: { $ref: '#/components/schemas/TipoCuenta' }
-        estado: { type: boolean }
+        tipoCuenta:
+          $ref: '#/components/schemas/TipoCuenta'
+
+    CambiarEstadoCuentaRequest:
+      type: object
+      required: [estado]
+      properties:
+        estado:
+          type: boolean
+          example: false
 
     CuentaResponse:
       type: object
@@ -351,33 +447,28 @@ components:
       properties:
         numeroCuenta:
           type: string
+          maxLength: 20
           example: "478758"
         valor:
           type: number
           format: double
           description: Positivo = depósito, negativo = retiro. Distinto de cero.
           example: -575
+
+    ActualizarMovimientoRequest:
+      type: object
+      description: Solo la descripción es editable (ledger inmutable)
+      properties:
         descripcion:
           type: string
-          description: Nota libre del movimiento (opcional, metadata).
           maxLength: 255
-          example: "Retiro cajero"
-
-    MovimientoUpdateRequest:
-      type: object
-      description: >-
-        Único campo editable de un movimiento. El ledger es inmutable: el monto
-        (valor) y el saldo no se modifican. Corregir un monto se hace con un
-        movimiento de reversa.
-      required: [descripcion]
-      properties:
-        descripcion: { type: string, maxLength: 255, example: "Pago de nómina" }
+          example: ajuste manual
 
     MovimientoResponse:
       type: object
       properties:
         id: { type: integer, format: int64, example: 1 }
-        fecha: { type: string, format: date-time, example: "2022-02-10T10:15:30" }
+        fecha: { type: string, format: date-time, example: "2022-02-10T10:15:30Z" }
         tipoMovimiento: { $ref: '#/components/schemas/TipoMovimiento' }
         valor: { type: number, format: double, example: -575 }
         saldo:
@@ -385,8 +476,8 @@ components:
           format: double
           description: Saldo disponible resultante tras el movimiento
           example: 1425
-        cuentaId: { type: integer, format: int64, example: 1 }
-        descripcion: { type: string, nullable: true, example: "Pago de nómina" }
+        numeroCuenta: { type: string, example: "478758" }
+        descripcion: { type: string, nullable: true, example: ajuste manual }
 
     ReporteEstadoCuenta:
       type: object
@@ -394,7 +485,7 @@ components:
         Fila del reporte de estado de cuenta. Las claves JSON respetan
         exactamente el ejemplo del enunciado (capitalizadas, con espacios).
       properties:
-        Fecha: { type: string, example: "10/2/2022 10:15:30" }
+        Fecha: { type: string, example: "10/2/2022" }
         Cliente: { type: string, example: Marianela Montalvo }
         "Numero Cuenta": { type: string, example: "225487" }
         Tipo: { type: string, example: Corriente }

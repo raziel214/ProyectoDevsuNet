@@ -1,0 +1,10 @@
+# Reduce el contexto de build: solo necesitamos slnx, csproj y src/
+**/bin/
+**/obj/
+**/out/
+tests/
+.vs/
+*.user
+.env
+.env.*
+!.env.example
