@@ -37,9 +37,11 @@ using (var loggerFactory = LoggerFactory.Create(b => b.AddConsole()))
         startupLogger.LogWarning("[Vault] Deshabilitado: usando credenciales de configuracion.");
         var db = builder.Configuration.GetSection("Database");
         secrets = new VaultSecrets(
-            db["Username"] ?? "devsu", db["Password"] ?? "devsu",
-            builder.Configuration["RabbitMq:Username"] ?? "devsu",
-            builder.Configuration["RabbitMq:Password"] ?? "devsu");
+            // Sin fallbacks hardcodeados: si falta la config, falla explicito.
+            db["Username"] ?? throw new InvalidOperationException("Falta Database:Username (Vault deshabilitado)."),
+            db["Password"] ?? throw new InvalidOperationException("Falta Database:Password (Vault deshabilitado)."),
+            builder.Configuration["RabbitMq:Username"],
+            builder.Configuration["RabbitMq:Password"]);
     }
 }
 
