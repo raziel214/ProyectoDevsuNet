@@ -37,17 +37,25 @@ public sealed class ClienteSyncConsumer(
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await ConectarConReintentosAsync(stoppingToken);
-        await DeclararTopologiaAsync(stoppingToken);
+        // Un fallo del consumidor NO debe tumbar el API: se registra y el host sigue.
+        try
+        {
+            await ConectarConReintentosAsync(stoppingToken);
+            await DeclararTopologiaAsync(stoppingToken);
 
-        var consumer = new AsyncEventingBasicConsumer(_channel!);
-        consumer.ReceivedAsync += OnMessageAsync;
-        await _channel!.BasicConsumeAsync(_options.Queue, autoAck: false, consumer, stoppingToken);
+            var consumer = new AsyncEventingBasicConsumer(_channel!);
+            consumer.ReceivedAsync += OnMessageAsync;
+            await _channel!.BasicConsumeAsync(_options.Queue, autoAck: false, consumer, stoppingToken);
 
-        logger.LogInformation("Consumidor escuchando {Queue} (binding {Rk})", _options.Queue, _options.RoutingKey);
+            logger.LogInformation("Consumidor escuchando {Queue} (binding {Rk})", _options.Queue, _options.RoutingKey);
 
-        try { await Task.Delay(Timeout.Infinite, stoppingToken); }
-        catch (OperationCanceledException) { /* shutdown */ }
+            await Task.Delay(Timeout.Infinite, stoppingToken);
+        }
+        catch (OperationCanceledException) { /* shutdown normal */ }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "El consumidor se detuvo por un error; el API sigue operativo.");
+        }
     }
 
     private async Task OnMessageAsync(object sender, BasicDeliverEventArgs ea)
