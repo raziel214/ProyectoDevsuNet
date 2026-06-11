@@ -2,20 +2,30 @@ openapi: 3.0.3
 info:
   title: MS Clientes API
   description: >-
-    Microservicio de Clientes y Personas — Prueba técnica Devsu.
+    Microservicio de Clientes y Personas — Prueba técnica Devsu (versión .NET).
     Gestiona el CRUD de Clientes (entidad de dominio que hereda de Persona) y
     publica eventos de dominio hacia RabbitMQ para sincronizar el microservicio
     de Cuentas (comunicación asíncrona).
-  version: 1.0.0
+
+
+    Diseño de dominio bancario: las operaciones sensibles están separadas en
+    endpoints propios y auditables — el perfil, el estado (habilitar/inhabilitar)
+    y la contraseña (credencial) se modifican por separado. La identidad
+    (identificacion, clienteId) es inmutable.
+  version: 2.0.0
   contact:
     name: John Fredy Quimbaya
 servers:
-  - url: http://localhost:8085
-    description: Local (puerto host del microservicio ms-clientes)
+  - url: http://localhost:8090
+    description: Local (puerto host del microservicio ms-clientes .NET)
 
 tags:
   - name: Clientes
     description: Operaciones CRUD sobre clientes (F1)
+
+# Todos los endpoints (salvo health/swagger) requieren un Bearer JWT de Keycloak.
+security:
+  - bearerAuth: []
 
 paths:
   /api/clientes:
@@ -32,6 +42,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ClienteResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
     post:
       tags: [Clientes]
       summary: Crear cliente
@@ -66,6 +78,8 @@ paths:
                 $ref: '#/components/schemas/ClienteResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '409':
           $ref: '#/components/responses/Conflict'
 
@@ -83,31 +97,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ClienteResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
     put:
       tags: [Clientes]
-      summary: Actualizar cliente
-      operationId: actualizarCliente
+      summary: Actualizar el perfil (datos personales) de un cliente
+      description: >-
+        Actualiza únicamente los datos de perfil. La identidad
+        (identificacion, clienteId), el estado y la contraseña NO se modifican
+        aquí: tienen operaciones dedicadas.
+      operationId: actualizarPerfilCliente
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ClienteRequest'
+              $ref: '#/components/schemas/ActualizarPerfilRequest'
       responses:
         '200':
-          description: Cliente actualizado
+          description: Perfil actualizado
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ClienteResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
     delete:
       tags: [Clientes]
       summary: Eliminar cliente
@@ -115,10 +135,82 @@ paths:
       responses:
         '204':
           description: Cliente eliminado (sin contenido)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/clientes/{id}/estado:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    patch:
+      tags: [Clientes]
+      summary: Habilitar o inhabilitar un cliente
+      description: Operación sensible y auditada. Solo cambia el estado del cliente.
+      operationId: cambiarEstadoCliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CambiarEstadoRequest'
+            example:
+              estado: false
+      responses:
+        '200':
+          description: Estado actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/clientes/{id}/contrasena:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    post:
+      tags: [Clientes]
+      summary: Cambiar la contraseña (credencial) de un cliente
+      description: >-
+        Operación sensible y auditada. Verifica la contraseña actual antes de
+        establecer la nueva. Responde 400 si la contraseña actual es incorrecta.
+      operationId: cambiarContrasenaCliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CambiarContrasenaRequest'
+            example:
+              contrasenaActual: "1234"
+              contrasenaNueva: "5678"
+      responses:
+        '204':
+          description: Contraseña actualizada (sin contenido)
+        '400':
+          description: Datos inválidos o contraseña actual incorrecta
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT emitido por Keycloak (realm internos-dev).
+
   parameters:
     IdPath:
       name: id
@@ -132,6 +224,12 @@ components:
   responses:
     BadRequest:
       description: Datos de entrada inválidos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Token ausente, inválido o expirado
       content:
         application/json:
           schema:
@@ -155,6 +253,7 @@ components:
       enum: [MASCULINO, FEMENINO, OTRO]
 
     ClienteRequest:
+      description: Datos para crear un cliente (incluye identidad y credencial).
       type: object
       required: [nombre, identificacion, clienteId, contrasena, estado]
       properties:
@@ -172,7 +271,7 @@ components:
           example: 35
         identificacion:
           type: string
-          description: Documento de identidad. Único.
+          description: Documento de identidad. Único e inmutable.
           maxLength: 20
           example: "0102030405"
         direccion:
@@ -185,7 +284,7 @@ components:
           example: "098254785"
         clienteId:
           type: string
-          description: Identificador de negocio / usuario de login. Único.
+          description: Identificador de negocio / usuario de login. Único e inmutable.
           maxLength: 50
           example: jlema
         contrasena:
@@ -197,6 +296,56 @@ components:
         estado:
           type: boolean
           example: true
+
+    ActualizarPerfilRequest:
+      description: >-
+        Datos de perfil modificables. No incluye identidad, estado ni
+        contraseña (operaciones separadas).
+      type: object
+      required: [nombre]
+      properties:
+        nombre:
+          type: string
+          maxLength: 120
+          example: Jose Lema
+        genero:
+          $ref: '#/components/schemas/Genero'
+        edad:
+          type: integer
+          minimum: 0
+          maximum: 120
+          example: 35
+        direccion:
+          type: string
+          maxLength: 200
+          example: Otavalo sn y principal
+        telefono:
+          type: string
+          maxLength: 20
+          example: "098254785"
+
+    CambiarEstadoRequest:
+      type: object
+      required: [estado]
+      properties:
+        estado:
+          type: boolean
+          example: false
+
+    CambiarContrasenaRequest:
+      type: object
+      required: [contrasenaActual, contrasenaNueva]
+      properties:
+        contrasenaActual:
+          type: string
+          minLength: 4
+          maxLength: 100
+          example: "1234"
+        contrasenaNueva:
+          type: string
+          minLength: 4
+          maxLength: 100
+          example: "5678"
 
     ClienteResponse:
       type: object

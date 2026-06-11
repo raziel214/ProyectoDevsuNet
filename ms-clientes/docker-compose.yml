@@ -1,0 +1,46 @@
+# ============================================================
+# docker-compose — ms-clientes .NET
+# Levanta el microservicio conectado a la infra compartida usando los
+# alias de red internos (vault, postgres, rabbitmq, keycloak), igual que
+# el contenedor Java.
+#
+# Uso:
+#   1) crea ms-clientes/.env a partir de .env.example (con la password de Vault)
+#   2) docker compose up -d --build
+# ============================================================
+
+services:
+  ms-clientes-net:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: devsu/ms-clientes-net:latest
+    container_name: ms-clientes-net
+    restart: unless-stopped
+    ports:
+      - "8090:8080"   # host 8090 -> contenedor 8080 (8085 lo usa el Java)
+    environment:
+      # --- Vault (secretos) ---
+      VAULT_URI: http://vault:8200
+      VAULT_USERPASS_PASSWORD: ${VAULT_USERPASS_PASSWORD}
+      Vault__SecretPath: dev/devsu/ms-clientes
+      # --- Base de datos (credenciales vienen de Vault) ---
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      Database__Name: devsu_clientes_net
+      MigrateOnStartup: "true"
+      # --- RabbitMQ (broker compartido, puerto interno 5672) ---
+      RABBITMQ_HOST: rabbitmq
+      RabbitMq__Port: "5672"
+      RabbitMq__VirtualHost: itilsupport
+      # --- Keycloak (validacion JWT por JWKS, puerto interno 8080) ---
+      Keycloak__Authority: http://keycloak:8080/realms/internos-dev
+    networks:
+      - itil_network
+      - itilsupport_network_dev
+
+networks:
+  itil_network:
+    external: true
+  itilsupport_network_dev:
+    external: true
