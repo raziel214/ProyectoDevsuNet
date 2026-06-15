@@ -64,7 +64,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="C4-Nivel2-Contenedores" id="wpK3DiTWUOvM_fAog0hf">
-    <mxGraphModel dx="2701" dy="1792" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="3422" dy="2220" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -88,12 +88,12 @@
             <mxGeometry height="150" width="300" x="50" y="200" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="ms-clientes" c4Type="Container" c4Technology="C# / Net core" c4Description="CRUD de Cliente. Publica eventos ClienteCreado/Actualizado/Eliminado. Hexagonal." label="&lt;b style=&quot;font-size: 15px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C2-5">
+        <object placeholders="1" c4Name="ms-clientes" c4Type="Container" c4Technology="Java 17 / Spring Boot" c4Description="CRUD de Cliente. Publica eventos ClienteCreado/Actualizado/Eliminado. Hexagonal." label="&lt;b style=&quot;font-size: 15px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C2-5">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#1168BD;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0D5AA8;metaEdit=1;fontSize=16;" vertex="1">
             <mxGeometry height="180" width="300" x="40" y="660" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="ms-cuentas" c4Type="Container" c4Technology="C# / Net core" c4Description="CRU de Cuenta y Movimiento, validacion de saldo y reporte de estado de cuenta. Consume eventos y mantiene replica cliente_ref." label="&lt;b style=&quot;font-size: 15px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C2-6">
+        <object placeholders="1" c4Name="ms-cuentas" c4Type="Container" c4Technology="Java 17 / Spring Boot" c4Description="CRU de Cuenta y Movimiento, validacion de saldo y reporte de estado de cuenta. Consume eventos y mantiene replica cliente_ref." label="&lt;b style=&quot;font-size: 15px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C2-6">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#1168BD;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0D5AA8;metaEdit=1;fontSize=16;" vertex="1">
             <mxGeometry height="180" width="300" x="920" y="689" as="geometry" />
           </mxCell>
@@ -270,7 +270,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="C4-Nivel3-Componentes-ms-clientes" id="comp-clientes-001">
-    <mxGraphModel dx="2884" dy="731" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2939" dy="765" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -279,7 +279,7 @@
             <mxGeometry height="940" width="1590" x="200" y="40" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="API Gateway" c4Type="Container" c4Technology="YARP Gateway" c4Description="Enruta /clientes con JWT." label="&lt;b style=&quot;font-size: 15px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C3-32">
+        <object placeholders="1" c4Name="API Gateway" c4Type="Container" c4Technology="Spring Cloud Gateway" c4Description="Enruta /clientes con JWT." label="&lt;b style=&quot;font-size: 15px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C3-32">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;metaEdit=1;fontSize=16;" vertex="1">
             <mxGeometry height="120" width="250" x="-180" y="120" as="geometry" />
           </mxCell>
@@ -304,17 +304,17 @@
             <mxGeometry height="120" width="250" x="1950" y="625" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="ClienteController" c4Type="Component" c4Technology="ASP.NET Core Web API" c4Description="Expone CRUD /clientes; valida ClienteRequest; mapea DTO-dominio." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C3-37">
+        <object placeholders="1" c4Name="ClienteController" c4Type="Component" c4Technology="Spring Web / REST" c4Description="Expone CRUD /clientes; valida ClienteRequest; mapea DTO-dominio." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C3-37">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#2086C9;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=16;" vertex="1">
             <mxGeometry height="120" width="260" x="250" y="100" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="IExceptionHandler" c4Type="Component" c4Technology="@RestControllerAdvice" c4Description="Traduce excepciones a ErrorResponse." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C3-38">
+        <object placeholders="1" c4Name="GlobalExceptionHandler" c4Type="Component" c4Technology="@RestControllerAdvice" c4Description="Traduce excepciones a ErrorResponse." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C3-38">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#2086C9;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=16;" vertex="1">
             <mxGeometry height="90" width="260" x="250" y="360" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="SecurityConfig" c4Type="Component" c4Technology="JwtBearer / OAuth2 RS" c4Description="Resource Server JWT; VaultTokenResolver inyecta secretos." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C3-39">
+        <object placeholders="1" c4Name="SecurityConfig" c4Type="Component" c4Technology="Spring Security OAuth2 RS" c4Description="Resource Server JWT; VaultTokenResolver inyecta secretos." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C3-39">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#2086C9;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=16;" vertex="1">
             <mxGeometry height="110" width="260" x="250" y="620" as="geometry" />
           </mxCell>
@@ -329,17 +329,17 @@
             <mxGeometry height="120" width="260" x="600" y="745" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="ClientePersistenceAdapter" c4Type="Component" c4Technology="Entity Framework Core" c4Description="Implementa ClienteRepositoryPort; ClienteJpaRepository + mapper entidad-dominio." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C3-42">
+        <object placeholders="1" c4Name="ClientePersistenceAdapter" c4Type="Component" c4Technology="Spring Data JPA" c4Description="Implementa ClienteRepositoryPort; ClienteJpaRepository + mapper entidad-dominio." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C3-42">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#2086C9;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=16;" vertex="1">
             <mxGeometry height="130" width="300" x="1390" y="90" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="ClienteEventPublisherAdapter" c4Type="Component" c4Technology="MassTransit" c4Description="Implementa ClienteEventPublisherPort; publica ClienteEvent al topic exchange." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C3-43">
+        <object placeholders="1" c4Name="ClienteEventPublisherAdapter" c4Type="Component" c4Technology="Spring AMQP" c4Description="Implementa ClienteEventPublisherPort; publica ClienteEvent al topic exchange." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C3-43">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#2086C9;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=16;" vertex="1">
             <mxGeometry height="130" width="300" x="1390" y="340" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="BCryptPasswordHasherAdapter" c4Type="Component" c4Technology="BCrypt.Net-Next" c4Description="Implementa PasswordHasherPort; hashea contrasenas (BCrypt)." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C3-44">
+        <object placeholders="1" c4Name="BCryptPasswordHasherAdapter" c4Type="Component" c4Technology="Spring Security Crypto" c4Description="Implementa PasswordHasherPort; hashea contrasenas (BCrypt)." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C3-44">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#2086C9;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=16;" vertex="1">
             <mxGeometry height="110" width="300" x="1390" y="650" as="geometry" />
           </mxCell>
@@ -349,22 +349,22 @@
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Type="Relationship" c4Technology="Net core" c4Description="Usa port-in Crear/Actualizar/...UseCase" label="&lt;div style=&quot;text-align: center&quot;&gt;&lt;b&gt;%c4Description%&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center&quot;&gt;[%c4Technology%]&lt;/div&gt;" id="C3-46">
+        <object placeholders="1" c4Type="Relationship" c4Technology="Java" c4Description="Usa port-in Crear/Actualizar/...UseCase" label="&lt;div style=&quot;text-align: center&quot;&gt;&lt;b&gt;%c4Description%&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center&quot;&gt;[%c4Technology%]&lt;/div&gt;" id="C3-46">
           <mxCell edge="1" parent="1" source="C3-37" style="endArrow=blockThin;html=1;fontSize=12;fontColor=#404040;strokeWidth=1;endFill=1;strokeColor=#828282;elbow=vertical;metaEdit=1;endSize=12;startSize=12;jumpStyle=arc;jumpSize=14;rounded=0;edgeStyle=orthogonalEdgeStyle;" target="C3-40">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Type="Relationship" c4Technology="Net core" c4Description="Errores manejados por handler" label="&lt;div style=&quot;text-align: center&quot;&gt;&lt;b&gt;%c4Description%&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center&quot;&gt;[%c4Technology%]&lt;/div&gt;" id="C3-47">
+        <object placeholders="1" c4Type="Relationship" c4Technology="Java" c4Description="Errores manejados por" label="&lt;div style=&quot;text-align: center&quot;&gt;&lt;b&gt;%c4Description%&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center&quot;&gt;[%c4Technology%]&lt;/div&gt;" id="C3-47">
           <mxCell edge="1" parent="1" source="C3-37" style="endArrow=blockThin;html=1;fontSize=12;fontColor=#404040;strokeWidth=1;endFill=1;strokeColor=#828282;elbow=vertical;metaEdit=1;endSize=12;startSize=12;jumpStyle=arc;jumpSize=14;rounded=0;edgeStyle=orthogonalEdgeStyle;" target="C3-38">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Type="Relationship" c4Technology="Net core" c4Description="Crea y aplica reglas" label="&lt;div style=&quot;text-align: center&quot;&gt;&lt;b&gt;%c4Description%&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center&quot;&gt;[%c4Technology%]&lt;/div&gt;" id="C3-48">
+        <object placeholders="1" c4Type="Relationship" c4Technology="Java" c4Description="Crea y aplica reglas" label="&lt;div style=&quot;text-align: center&quot;&gt;&lt;b&gt;%c4Description%&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center&quot;&gt;[%c4Technology%]&lt;/div&gt;" id="C3-48">
           <mxCell edge="1" parent="1" source="C3-40" style="endArrow=blockThin;html=1;fontSize=12;fontColor=#404040;strokeWidth=1;endFill=1;strokeColor=#828282;elbow=vertical;metaEdit=1;endSize=12;startSize=12;jumpStyle=arc;jumpSize=14;rounded=0;edgeStyle=orthogonalEdgeStyle;" target="C3-41">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Type="Relationship" c4Technology="Net core" c4Description="Usa port-out ClienteRepositoryPort" label="&lt;div style=&quot;text-align: center&quot;&gt;&lt;b&gt;%c4Description%&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center&quot;&gt;[%c4Technology%]&lt;/div&gt;" id="C3-49">
+        <object placeholders="1" c4Type="Relationship" c4Technology="Java" c4Description="Usa port-out ClienteRepositoryPort" label="&lt;div style=&quot;text-align: center&quot;&gt;&lt;b&gt;%c4Description%&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center&quot;&gt;[%c4Technology%]&lt;/div&gt;" id="C3-49">
           <mxCell edge="1" parent="1" source="C3-40" style="endArrow=blockThin;html=1;fontSize=12;fontColor=#404040;strokeWidth=1;endFill=1;strokeColor=#828282;elbow=vertical;metaEdit=1;endSize=12;startSize=12;jumpStyle=arc;jumpSize=14;rounded=0;edgeStyle=orthogonalEdgeStyle;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" target="C3-42">
             <mxGeometry relative="1" as="geometry">
               <Array as="points">
@@ -374,14 +374,14 @@
             </mxGeometry>
           </mxCell>
         </object>
-        <object placeholders="1" c4Type="Relationship" c4Technology="Net core" c4Description="Usa port-out ClienteEventPublisherPort" label="&lt;div style=&quot;text-align: center&quot;&gt;&lt;b&gt;%c4Description%&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center&quot;&gt;[%c4Technology%]&lt;/div&gt;" id="C3-50">
+        <object placeholders="1" c4Type="Relationship" c4Technology="Java" c4Description="Usa port-out ClienteEventPublisherPort" label="&lt;div style=&quot;text-align: center&quot;&gt;&lt;b&gt;%c4Description%&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center&quot;&gt;[%c4Technology%]&lt;/div&gt;" id="C3-50">
           <mxCell edge="1" parent="1" source="C3-40" style="endArrow=blockThin;html=1;fontSize=12;fontColor=#404040;strokeWidth=1;endFill=1;strokeColor=#828282;elbow=vertical;metaEdit=1;endSize=12;startSize=12;jumpStyle=arc;jumpSize=14;rounded=0;edgeStyle=orthogonalEdgeStyle;" target="C3-43">
             <mxGeometry relative="1" x="0.4766" y="5" as="geometry">
               <mxPoint as="offset" />
             </mxGeometry>
           </mxCell>
         </object>
-        <object placeholders="1" c4Type="Relationship" c4Technology="Net core" c4Description="Usa port-out PasswordHasherPort" label="&lt;div style=&quot;text-align: center&quot;&gt;&lt;b&gt;%c4Description%&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center&quot;&gt;[%c4Technology%]&lt;/div&gt;" id="C3-51">
+        <object placeholders="1" c4Type="Relationship" c4Technology="Java" c4Description="Usa port-out PasswordHasherPort" label="&lt;div style=&quot;text-align: center&quot;&gt;&lt;b&gt;%c4Description%&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center&quot;&gt;[%c4Technology%]&lt;/div&gt;" id="C3-51">
           <mxCell edge="1" parent="1" source="C3-40" style="endArrow=blockThin;html=1;fontSize=12;fontColor=#404040;strokeWidth=1;endFill=1;strokeColor=#828282;elbow=vertical;metaEdit=1;endSize=12;startSize=12;jumpStyle=arc;jumpSize=14;rounded=0;edgeStyle=orthogonalEdgeStyle;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="C3-44">
             <mxGeometry relative="1" as="geometry">
               <Array as="points">
@@ -415,7 +415,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="C4-Nivel3-Componentes-ms-cuentas" id="comp-cuentas-001">
-    <mxGraphModel dx="3001" dy="801" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2832" dy="701" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -424,7 +424,7 @@
             <mxGeometry height="1200" width="1820" x="210" y="40" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="API Gateway" c4Type="Container" c4Technology="YARP" c4Description="Enruta /cuentas, /movimientos, /reportes." label="&lt;b style=&quot;font-size: 15px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-57">
+        <object placeholders="1" c4Name="API Gateway" c4Type="Container" c4Technology="Spring Cloud Gateway" c4Description="Enruta /cuentas, /movimientos, /reportes." label="&lt;b style=&quot;font-size: 15px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 12px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-57">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#23A2D9;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#0E7DAD;metaEdit=1;fontSize=16;" vertex="1">
             <mxGeometry height="120" width="250" x="-170" y="120" as="geometry" />
           </mxCell>
@@ -449,27 +449,27 @@
             <mxGeometry height="180" width="210" x="2250" y="495" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="CuentaController" c4Type="Component" c4Technology="ASP.NET Core Web API" c4Description="CRU /cuentas." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-62">
+        <object placeholders="1" c4Name="CuentaController" c4Type="Component" c4Technology="REST" c4Description="CRU /cuentas." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-62">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#2086C9;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=16;" vertex="1">
             <mxGeometry height="110" width="250" x="250" y="120" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="MovimientoController" c4Type="Component" c4Technology="ASP.NET Core Web API" c4Description="Registra/consulta /movimientos." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-63">
+        <object placeholders="1" c4Name="MovimientoController" c4Type="Component" c4Technology="REST" c4Description="Registra/consulta /movimientos." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-63">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#2086C9;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=16;" vertex="1">
             <mxGeometry height="110" width="250" x="250" y="280" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="ReporteController" c4Type="Component" c4Technology="ASP.NET Core Web API" c4Description="GET /reportes (estado de cuenta, F4)." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-64">
+        <object placeholders="1" c4Name="ReporteController" c4Type="Component" c4Technology="REST" c4Description="GET /reportes (estado de cuenta, F4)." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-64">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#2086C9;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=16;" vertex="1">
             <mxGeometry height="110" width="250" x="250" y="440" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="ClienteEventListener" c4Type="Component" c4Technology="MassTransit IConsumer @RabbitListener" c4Description="Consume ClienteEvent; traduce a ClienteRef." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-65">
+        <object placeholders="1" c4Name="ClienteEventListener" c4Type="Component" c4Technology="Spring AMQP @RabbitListener" c4Description="Consume ClienteEvent; traduce a ClienteRef." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-65">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#2086C9;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=16;" vertex="1">
             <mxGeometry height="120" width="250" x="250" y="984" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="SecurityConfig" c4Type="Component" c4Technology="JwtBearer / OAuth2 RS" c4Description="Resource Server JWT; VaultTokenResolver." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-66">
+        <object placeholders="1" c4Name="SecurityConfig" c4Type="Component" c4Technology="Spring Security OAuth2 RS" c4Description="Resource Server JWT; VaultTokenResolver." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-66">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#2086C9;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=16;" vertex="1">
             <mxGeometry height="110" width="250" x="300" y="630" as="geometry" />
           </mxCell>
@@ -499,12 +499,12 @@
             <mxGeometry height="160" width="300" x="1280" y="605" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="CuentaPersistenceAdapter" c4Type="Component" c4Technology="Entity Framework Core" c4Description="Implementa CuentaRepositoryPort (CuentaJpaRepository)." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-72">
+        <object placeholders="1" c4Name="CuentaPersistenceAdapter" c4Type="Component" c4Technology="Spring Data JPA" c4Description="Implementa CuentaRepositoryPort (CuentaJpaRepository)." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-72">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#2086C9;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=16;" vertex="1">
             <mxGeometry height="110" width="300" x="1290" y="120" as="geometry" />
           </mxCell>
         </object>
-        <object placeholders="1" c4Name="MovimientoPersistenceAdapter" c4Type="Component" c4Technology="Entity Framework Core" c4Description="Implementa MovimientoRepositoryPort (MovimientoJpaRepository)." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-73">
+        <object placeholders="1" c4Name="MovimientoPersistenceAdapter" c4Type="Component" c4Technology="Spring Data JPA" c4Description="Implementa MovimientoRepositoryPort (MovimientoJpaRepository)." label="&lt;b style=&quot;font-size: 13px;&quot;&gt;%c4Name%&lt;/b&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;[%c4Type%: %c4Technology%]&lt;/div&gt;&lt;br&gt;&lt;div style=&quot;font-size: 11px;&quot;&gt;%c4Description%&lt;/div&gt;" id="C4P-73">
           <mxCell parent="1" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#63BEF2;fontColor=#ffffff;align=center;arcSize=10;strokeColor=#2086C9;metaEdit=1;metaData={&quot;c4Type&quot;:{&quot;editable&quot;:false}};points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];fontSize=16;" vertex="1">
             <mxGeometry height="110" width="300" x="1500" y="359" as="geometry" />
           </mxCell>
