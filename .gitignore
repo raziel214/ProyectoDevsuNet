@@ -3,9 +3,10 @@
 # ============================================================
 
 # ---------- Build .NET ----------
+# Nota: NO usar el patron amplio "[Oo]ut/" porque colisiona con la carpeta
+# hexagonal "Port/Out". El output de build queda cubierto por bin/obj/publish.
 [Bb]in/
 [Oo]bj/
-[Oo]ut/
 [Dd]ebug/
 [Rr]elease/
 [Dd]ebugPublic/

@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Devsu.Clientes.Api/Devsu.Clientes.Api.csproj" />
+    <Project Path="src/Devsu.Clientes.Application/Devsu.Clientes.Application.csproj" />
+    <Project Path="src/Devsu.Clientes.Domain/Devsu.Clientes.Domain.csproj" />
+    <Project Path="src/Devsu.Clientes.Infrastructure/Devsu.Clientes.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Devsu.Clientes.IntegrationTests/Devsu.Clientes.IntegrationTests.csproj" />
+    <Project Path="tests/Devsu.Clientes.UnitTests/Devsu.Clientes.UnitTests.csproj" />
+  </Folder>
+</Solution>
